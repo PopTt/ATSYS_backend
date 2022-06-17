@@ -51,6 +51,7 @@ module.exports = {
       user_service.getUserByUserEmail(body.email, (err, result) => {
         if (err) {
           console.log(err);
+          throw new Error();
         }
         if (!result) {
           return res.status(401).json({
@@ -105,7 +106,7 @@ module.exports = {
     user_service.getUserByUID(user_id, (err, result) => {
       if (err) {
         console.log(err);
-        return;
+        throw new Error();
       }
       if (!result) {
         return res.status(401).json({
@@ -118,6 +119,28 @@ module.exports = {
         data: result,
       });
     });
+  },
+
+  getInstructorsByAdminId: (req, res) => {
+    try {
+      const admin_id = req.params.admin_id;
+      user_service.getInstructorsByAdminId(admin_id, (err, result) => {
+        if (err) {
+          console.log(err);
+          throw new Error();
+        }
+        return res.status(200).json({
+          success: 1,
+          data: result,
+        });
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        success: 0,
+        message: 'Internal Server Error',
+      });
+    }
   },
 
   getUser: (req, res) => {

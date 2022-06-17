@@ -8,6 +8,11 @@ const checkRoles = require('../../middlewares-auth/verify-role');
 
 router.get('/', checkWebToken, user_controller.getUser);
 router.get('/:user_id', checkWebToken, user_controller.getUserByUID);
+router.get(
+  '/getInstructors/:admin_id',
+  checkWebToken,
+  user_controller.getInstructorsByAdminId
+);
 
 router.patch('/', checkWebToken, user_controller.updateUser);
 router.delete('/', checkWebToken, user_controller.deleteUser);
