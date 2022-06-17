@@ -34,7 +34,20 @@ module.exports = {
 
   getEvent: (event_id, callBack) => {
     db.query(
-      `SELECT * FROM event WHERE event_id = ?`,
+      `SELECT event_id, event_name, event_description, established_time, admin_id FROM event WHERE event_id = ?`,
+      [event_id],
+      (err, result) => {
+        if (err) {
+          callBack(err);
+        }
+        return callBack(null, result);
+      }
+    );
+  },
+
+  getEventInvitationCode: (event_id, callBack) => {
+    db.query(
+      `SELECT invitation_code FROM event WHERE event_id = ?`,
       [event_id],
       (err, result) => {
         if (err) {
@@ -58,15 +71,15 @@ module.exports = {
     );
   },
 
-  getEventByInvitationCode: (invitation_code, callBack) => {
+  getUserEvents: (user_id, callBack) => {
     db.query(
-      `SELECT event_id, event_name, event_description, established_time, invitation_code, admin_id FROM event WHERE invitation_code = ?`,
-      [invitation_code],
+      `SELECT e.event_id, e.event_name, e.event_description, e.established_time, e.admin_id FROM user u, user_event ue, event e WHERE u.user_id = ue.user_id AND ue.event_id = e.event_id AND ue.user_id = ?`,
+      [user_id],
       (err, result) => {
         if (err) {
           callBack(err);
         }
-        return callBack(null, result[0]);
+        return callBack(null, result);
       }
     );
   },
@@ -120,6 +133,19 @@ module.exports = {
           callBack(err);
         }
         return callBack(null, result);
+      }
+    );
+  },
+
+  updateInvitationCode: (event_id, invitation_code) => {
+    db.query(
+      `UPDATE event SET invitation_code = ? WHERE event_id = ?`,
+      [invitation_code, event_id],
+      (err, result) => {
+        if (err) {
+          return err;
+        }
+        return result;
       }
     );
   },

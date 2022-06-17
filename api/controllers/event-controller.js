@@ -1,5 +1,33 @@
 const event_service = require('../services/event-service');
 
+function generateInvitationCode(event_id) {
+  let secret = event_id.toString();
+  let position = Math.floor(Math.random() * 2 + 1);
+  const randomAlphabet = (
+    len,
+    characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+  ) =>
+    [...Array(len)]
+      .map(() =>
+        characters.charAt(Math.floor(Math.random() * characters.length))
+      )
+      .join('');
+  let frontRandom = randomAlphabet(position);
+  let backRandom = randomAlphabet(position);
+  let invitation_code = frontRandom + secret + backRandom + position;
+
+  return invitation_code;
+}
+
+function convertBackEventId(invitation_code) {
+  let target = invitation_code.slice(-1);
+  let backTrash = parseInt(target) + 1;
+  let half = invitation_code.slice(0, -backTrash);
+  let orginal_code = half.substring(parseInt(target));
+
+  return orginal_code;
+}
+
 module.exports = {
   addEventInstructors: (req, res) => {
     try {
@@ -63,23 +91,27 @@ module.exports = {
   },
 
   joinEvent: (req, res) => {
-    const body = req.body; //user_id and event_id
-    const current_time = new Date();
-    body['join_time'] = current_time;
-    event_service.joinEvent(body, (err, result) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).json({
-          success: 0,
-          message: 'Server connection failure',
+    const body = req.body;
+    event_service.joinEvent(
+      {
+        event_id: convertBackEventId(body.invitation_code),
+        user_id: body.user_id,
+        join_time: new Date(),
+      },
+      (err, result) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).json({
+            success: 0,
+            message: 'Server connection failure',
+          });
+        }
+        return res.status(200).json({
+          success: 1,
+          message: 'Event join Successfully',
         });
       }
-      return res.status(200).json({
-        success: 1,
-        message: 'Event join Successfully',
-        data: result,
-      });
-    });
+    );
   },
 
   getEvent: (req, res) => {
@@ -119,6 +151,64 @@ module.exports = {
           success: 1,
           message: 'Get Events Success',
           data: result,
+        });
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        success: 0,
+        message: 'Internal Server Error',
+      });
+    }
+  },
+
+  getUserEvents: (req, res) => {
+    try {
+      const user_id = req.params.user_id;
+
+      event_service.getUserEvents(user_id, (err, result) => {
+        if (err) {
+          throw new Error(err);
+        }
+
+        return res.status(200).json({
+          success: 1,
+          message: 'Get Events Success',
+          data: result,
+        });
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        success: 0,
+        message: 'Internal Server Error',
+      });
+    }
+  },
+
+  getInvitationCode: (req, res) => {
+    try {
+      const event_id = req.params.event_id;
+
+      event_service.getEventInvitationCode(event_id, async (err, result) => {
+        if (err) {
+          throw new Error(err);
+        }
+
+        if (
+          result[0].invitation_code === null ||
+          result[0].invitation_code === undefined ||
+          result[0].invitation_code === ''
+        ) {
+          let temp = generateInvitationCode(event_id);
+          await event_service.updateInvitationCode(event_id, temp);
+          result[0].invitation_code = temp;
+        }
+
+        return res.status(200).json({
+          success: 1,
+          message: 'Get Invitation Code Success',
+          data: result[0],
         });
       });
     } catch (err) {
