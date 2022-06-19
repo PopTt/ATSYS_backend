@@ -91,27 +91,44 @@ module.exports = {
   },
 
   joinEvent: (req, res) => {
-    const body = req.body;
-    event_service.joinEvent(
-      {
-        event_id: convertBackEventId(body.invitation_code),
-        user_id: body.user_id,
-        join_time: new Date(),
-      },
-      (err, result) => {
-        if (err) {
-          console.log(err);
-          return res.status(500).json({
+    try {
+      const body = req.body;
+      event_service.getEventIdByInvitationCode(body.invitation_code, (err, result) => {
+        if (!result) {
+          return res.status(409).json({
             success: 0,
-            message: 'Server connection failure',
+            message: 'Invalid invitation code'
           });
+        } else {
+          event_service.joinEvent(
+            {
+              event_id: result.event_id,
+              user_id: body.user_id,
+              join_time: new Date(),
+            },
+            (err, result) => {
+              if (err) {
+                console.log(err);
+                return res.status(500).json({
+                  success: 0,
+                  message: 'Server connection failure',
+                });
+              }
+              return res.status(200).json({
+                success: 1,
+                message: 'Event join Successfully',
+              });
+            }
+          );
         }
-        return res.status(200).json({
-          success: 1,
-          message: 'Event join Successfully',
-        });
-      }
-    );
+      })
+    } catch (error) {
+      console.log(err);
+      return res.status(500).json({
+        success: 0,
+        message: 'Internal Server Error',
+      });
+    }
   },
 
   getEvent: (req, res) => {

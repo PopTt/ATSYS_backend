@@ -97,6 +97,19 @@ module.exports = {
     );
   },
 
+  getEventIdByInvitationCode: (invitation_code, callBack) => {
+    db.query(
+      `SELECT event_id FROM event WHERE invitation_code = ?`,
+      [invitation_code],
+      (err, result) => {
+        if (err) {
+          callBack(err);
+        }
+        return callBack(null, result[0]);
+      }
+    );
+  },
+
   getNotInEventInstructors: (admin_id, event_id, callBack) => {
     db.query(
       `SELECT user.user_id, user.first_name, user.last_name, user.email FROM user LEFT JOIN user_event ON user.user_id = user_event.user_id
@@ -110,6 +123,7 @@ module.exports = {
       }
     );
   },
+
 
   joinEvent: (data, callBack) => {
     db.query(
