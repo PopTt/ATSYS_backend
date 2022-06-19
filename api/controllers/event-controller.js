@@ -100,26 +100,42 @@ module.exports = {
             message: 'Invalid invitation code'
           });
         } else {
-          event_service.joinEvent(
+          const eventID = result.event_id
+          event_service.checkJoinEvent(
             {
-              event_id: result.event_id,
-              user_id: body.user_id,
-              join_time: new Date(),
+              'user_id': body.user_id,
+              'event_id': result.event_id
             },
             (err, result) => {
-              if (err) {
-                console.log(err);
-                return res.status(500).json({
+              if(result) {
+                return res.status(409).json({
                   success: 0,
-                  message: 'Server connection failure',
+                  message: 'Event already exists!',
+                  data: result,
                 });
+              }else{
+                event_service.joinEvent(
+                  {
+                    event_id: eventID,
+                    user_id: body.user_id,
+                    join_time: new Date(),
+                  },
+                  (err, result) => {
+                    if (err) {
+                      console.log(err);
+                      return res.status(500).json({
+                        success: 0,
+                        message: 'Server connection failure',
+                      });
+                    }
+                    return res.status(200).json({
+                      success: 1,
+                      message: 'Event join Successfully',
+                    });
+                  }
+                );
               }
-              return res.status(200).json({
-                success: 1,
-                message: 'Event join Successfully',
-              });
-            }
-          );
+            })
         }
       })
     } catch (error) {

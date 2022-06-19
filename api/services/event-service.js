@@ -110,6 +110,22 @@ module.exports = {
     );
   },
 
+  checkJoinEvent: (data, callBack) => {
+    db.query(
+      `SELECT ue_id FROM user_event WHERE user_id = ? AND event_id = ?`,
+      [
+        data.user_id, 
+        data.event_id
+      ],
+      (err, result) => {
+        if (err) {
+          callBack(err);
+        }
+        return callBack(null, result[0]);
+      }
+    );
+  },
+
   getNotInEventInstructors: (admin_id, event_id, callBack) => {
     db.query(
       `SELECT user.user_id, user.first_name, user.last_name, user.email FROM user LEFT JOIN user_event ON user.user_id = user_event.user_id
