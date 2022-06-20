@@ -62,14 +62,8 @@ module.exports = {
 
   updateUserByUID: (data, callBack) => {
     db.query(
-      `UPDATE user SET first_name = ?, last_name = ?, email = ?, password = ? WHERE user_id = ?`,
-      [
-        data.first_name,
-        data.last_name,
-        data.email,
-        data.password,
-        data.user_id,
-      ],
+      `UPDATE user SET first_name = ?, last_name = ?, email = ? WHERE user_id = ?`,
+      [data.first_name, data.last_name, data.email, data.user_id],
       (err, result) => {
         if (err) {
           callBack(err);
@@ -92,9 +86,22 @@ module.exports = {
     );
   },
 
-  getUserByUserEmail: (email, callBack) => {
+  login: (email, callBack) => {
     db.query(
       `SELECT user_id, first_name, last_name, email, password, permission_type FROM user WHERE email = ? AND status = 0`,
+      [email],
+      (err, result) => {
+        if (err) {
+          callBack(err);
+        }
+        return callBack(null, result[0]);
+      }
+    );
+  },
+
+  getUserByUserEmail: (email, callBack) => {
+    db.query(
+      `SELECT user_id, first_name, last_name, email, password, permission_type FROM user WHERE email = ?`,
       [email],
       (err, result) => {
         if (err) {

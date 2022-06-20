@@ -13,7 +13,7 @@ module.exports = {
         if (result) {
           return res.status(409).json({
             success: 0,
-            message: 'User with the email already exists!',
+            message: 'User with this email already exists!',
             data: result,
           });
         } else {
@@ -48,7 +48,7 @@ module.exports = {
     try {
       const body = req.body;
 
-      user_service.getUserByUserEmail(body.email, (err, result) => {
+      user_service.login(body.email, (err, result) => {
         if (err) {
           console.log(err);
           throw new Error();
@@ -163,47 +163,100 @@ module.exports = {
   },
 
   updateUser: (req, res) => {
-    const body = req.body;
-    const salt = bcrypt.genSaltSync(10);
-    body.password = bcrypt.hashSync(body.password, salt);
-    user_service.updateUserByUID(body, (err, result) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).json({
-          success: 0,
-          message: 'Database connection error',
+    try {
+      const body = req.body;
+
+      const checker = new Promise((resolve, _) => {
+        user_service.getUserByUID(body.user_id, async (err, result) => {
+          if (err) {
+            console.log(err);
+            return res.status(500).json({
+              success: 0,
+              message: 'Database connection error',
+            });
+          }
+
+          if (result.email == body.email) {
+            resolve('true');
+          } else {
+            user_service.getUserByUserEmail(body.email, (err, result) => {
+              if (err) {
+                console.log(err);
+                return res.status(500).json({
+                  success: 0,
+                  message: 'Database connection error',
+                });
+              }
+
+              if (result) {
+                return res.status(409).json({
+                  success: 0,
+                  message: 'User with this email already exists!',
+                  data: result,
+                });
+              } else {
+                resolve('true');
+              }
+            });
+          }
         });
-      }
-      if (!result) {
-        return res.json({
-          success: 0,
-          message: 'User Not Found',
-        });
-      }
-      return res.json({
-        success: 1,
-        message: 'UPDATED successfully',
       });
-    });
+
+      checker.then((value) => {
+        user_service.updateUserByUID(body, (err, result) => {
+          if (err) {
+            console.log(err);
+            return res.status(500).json({
+              success: 0,
+              message: 'Database connection error',
+            });
+          }
+          if (!result) {
+            return res.json({
+              success: 0,
+              message: 'User Not Found',
+            });
+          }
+          return res.json({
+            success: 1,
+            message: 'UPDATED successfully',
+          });
+        });
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        success: 0,
+        message: 'Internal Server Error',
+      });
+    }
   },
 
   deleteUser: (req, res) => {
-    const body = req.body;
-    user_service.deleteUser(body, (err, result) => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      if (!result) {
+    try {
+      const body = req.body;
+      user_service.deleteUser(body, (err, result) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        if (!result) {
+          return res.json({
+            success: 0,
+            message: 'User Not Found',
+          });
+        }
         return res.json({
-          success: 0,
-          message: 'User Not Found',
+          success: 1,
+          message: 'DELETED successfully',
         });
-      }
-      return res.json({
-        success: 1,
-        message: 'DELETED successfully',
       });
-    });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        success: 0,
+        message: 'Internal Server Error',
+      });
+    }
   },
 };

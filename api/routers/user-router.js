@@ -13,6 +13,11 @@ router.get(
   checkWebToken,
   user_controller.getInstructorsByAdminId
 );
+router.post(
+  '/updateInstructor',
+  [checkWebToken, checkRoles(ROLES.Admin)],
+  user_controller.updateUser
+);
 router.delete(
   '/deleteInstructor',
   [checkWebToken, checkRoles(ROLES.Admin)],
@@ -25,6 +30,10 @@ router.delete('/', checkWebToken, user_controller.deleteUser);
 router.post('/register', user_controller.register);
 router.post('/logout', checkWebToken, user_controller.logout);
 router.post('/login', user_controller.login);
-router.post('/android/login', checkRoles(ROLES.Instructor, ROLES.User), user_controller.login);
+router.post(
+  '/android/login',
+  checkRoles(ROLES.Instructor, ROLES.User),
+  user_controller.login
+);
 
 module.exports = router;
