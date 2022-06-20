@@ -13,6 +13,11 @@ router.get(
   checkWebToken,
   user_controller.getInstructorsByAdminId
 );
+router.delete(
+  '/deleteInstructor',
+  [checkWebToken, checkRoles(ROLES.Admin)],
+  user_controller.deleteUser
+);
 
 router.patch('/', checkWebToken, user_controller.updateUser);
 router.delete('/', checkWebToken, user_controller.deleteUser);

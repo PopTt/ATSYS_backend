@@ -56,7 +56,7 @@ module.exports = {
         if (!result) {
           return res.status(401).json({
             success: 0,
-            message: 'Email does not exist',
+            message: 'User does not exist',
           });
         }
         const login_result = bcrypt.compareSync(body.password, result.password);

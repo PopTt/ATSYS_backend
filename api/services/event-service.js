@@ -86,7 +86,7 @@ module.exports = {
 
   getEventMembers: (event_id, callBack) => {
     db.query(
-      `SELECT ue.ue_id, u.user_id, u.first_name, u.last_name, u.email, u.permission_type FROM user_event ue, user u, event e WHERE e.event_id = ue.event_id AND u.user_id = ue.user_id AND e.event_id = ?`,
+      `SELECT ue.ue_id, u.user_id, u.first_name, u.last_name, u.email, u.permission_type FROM user_event ue, user u, event e WHERE e.event_id = ue.event_id AND u.user_id = ue.user_id AND u.status = 0 AND e.event_id = ?`,
       [event_id],
       (err, result) => {
         if (err) {
@@ -113,10 +113,7 @@ module.exports = {
   checkJoinEvent: (data, callBack) => {
     db.query(
       `SELECT ue_id FROM user_event WHERE user_id = ? AND event_id = ?`,
-      [
-        data.user_id, 
-        data.event_id
-      ],
+      [data.user_id, data.event_id],
       (err, result) => {
         if (err) {
           callBack(err);
@@ -139,7 +136,6 @@ module.exports = {
       }
     );
   },
-
 
   joinEvent: (data, callBack) => {
     db.query(
@@ -195,7 +191,7 @@ module.exports = {
 
   getUserByEID: (event_id, callBack) => {
     db.query(
-      `SELECT user.first_name, user.last_name, user.permission_type user_event.join_time FROM user, user_event WHERE user_event.event_id = ? AND user.user_id = user_event.user_id`,
+      `SELECT user.first_name, user.last_name, user.permission_type user_event.join_time FROM user, user_event WHERE user_event.event_id = ? AND user.user_id = user_event.user_id AND user.status = 0`,
       [event_id],
       (err, result) => {
         if (err) {

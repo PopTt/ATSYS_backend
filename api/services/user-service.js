@@ -23,7 +23,7 @@ module.exports = {
 
   getUser: (callBack) => {
     db.query(
-      `SELECT user_id, first_name, last_name, email, permission_type FROM user`,
+      `SELECT user_id, first_name, last_name, email, permission_type FROM user WHERE status = 0`,
       [],
       (err, result) => {
         if (err) {
@@ -36,7 +36,7 @@ module.exports = {
 
   getUserByUID: (user_id, callBack) => {
     db.query(
-      `SELECT first_name, last_name, email, permission_type FROM user WHERE user_id = ?`,
+      `SELECT first_name, last_name, email, permission_type FROM user WHERE user_id = ? AND status = 0`,
       [user_id],
       (err, result) => {
         if (err) {
@@ -49,7 +49,7 @@ module.exports = {
 
   getInstructorsByAdminId: (admin_id, callBack) => {
     db.query(
-      `SELECT first_name, last_name, email, permission_type, admin_id FROM user WHERE admin_id = ?`,
+      `SELECT user_id, first_name, last_name, email, permission_type, admin_id FROM user WHERE admin_id = ? AND status = 0`,
       [admin_id],
       (err, result) => {
         if (err) {
@@ -81,7 +81,7 @@ module.exports = {
 
   deleteUser: (data, callBack) => {
     db.query(
-      `DELETE FROM user WHERE uid = ?`,
+      `UPDATE user SET status = 2 WHERE user_id = ?`,
       [data.user_id],
       (err, result) => {
         if (err) {
@@ -94,7 +94,7 @@ module.exports = {
 
   getUserByUserEmail: (email, callBack) => {
     db.query(
-      `SELECT user_id, first_name, last_name, email, password, permission_type FROM user WHERE email = ?`,
+      `SELECT user_id, first_name, last_name, email, password, permission_type FROM user WHERE email = ? AND status = 0`,
       [email],
       (err, result) => {
         if (err) {
