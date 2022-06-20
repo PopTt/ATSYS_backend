@@ -150,6 +150,19 @@ module.exports = {
     );
   },
 
+  removeEventMember: (data, callBack) => {
+    db.query(
+      `DELETE FROM user_event WHERE user_id = ? AND event_id = ?`,
+      [data.user_id, data.event_id],
+      (err, result) => {
+        if (err) {
+          return callBack(err);
+        }
+        return callBack(null, result);
+      }
+    );
+  },
+
   updateEvent: (data, callBack) => {
     db.query(
       `UPDATE event SET event_name = ?, event_description = ? WHERE event_id = ?`,

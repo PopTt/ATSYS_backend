@@ -178,6 +178,28 @@ module.exports = {
     }
   },
 
+  removeEventMember: (req, res) => {
+    try {
+      const body = req.body;
+      event_service.removeEventMember(body, (err, _) => {
+        if (err) {
+          throw new Error(err);
+        }
+
+        return res.status(200).json({
+          success: 1,
+          message: 'Remove event member successfully',
+        });
+      });
+    } catch (error) {
+      console.log(err);
+      return res.status(500).json({
+        success: 0,
+        message: 'Internal Server Error',
+      });
+    }
+  },
+
   getEvent: (req, res) => {
     try {
       const event_id = req.params.event_id;

@@ -39,6 +39,11 @@ router.post(
   event_controller.updateEvent
 );
 router.post('/join', [checkWebToken], event_controller.joinEvent);
+router.delete(
+  '/removeEventMember',
+  [checkWebToken, checkRoles(ROLES.Admin, ROLES.Instructor)],
+  event_controller.removeEventMember
+);
 router.post(
   '/addEventInstructors',
   [checkWebToken, checkRoles(ROLES.Admin)],
