@@ -90,54 +90,85 @@ module.exports = {
     }
   },
 
+  updateEvent: (req, res) => {
+    try {
+      const body = req.body;
+
+      event_service.updateEvent(body, (err, result) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).json({
+            success: 0,
+            message: 'Server connection failure',
+          });
+        }
+        return res.status(200).json({
+          success: 1,
+          message: 'Event Update Successfully',
+          data: result,
+        });
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        success: 0,
+        message: 'Internal Server Error',
+      });
+    }
+  },
+
   joinEvent: (req, res) => {
     try {
       const body = req.body;
-      event_service.getEventIdByInvitationCode(body.invitation_code, (err, result) => {
-        if (!result) {
-          return res.status(409).json({
-            success: 0,
-            message: 'Invalid invitation code'
-          });
-        } else {
-          const eventID = result.event_id
-          event_service.checkJoinEvent(
-            {
-              'user_id': body.user_id,
-              'event_id': result.event_id
-            },
-            (err, result) => {
-              if(result) {
-                return res.status(409).json({
-                  success: 0,
-                  message: 'Event already exists!',
-                  data: result,
-                });
-              }else{
-                event_service.joinEvent(
-                  {
-                    event_id: eventID,
-                    user_id: body.user_id,
-                    join_time: new Date(),
-                  },
-                  (err, result) => {
-                    if (err) {
-                      console.log(err);
-                      return res.status(500).json({
-                        success: 0,
-                        message: 'Server connection failure',
+      event_service.getEventIdByInvitationCode(
+        body.invitation_code,
+        (err, result) => {
+          if (!result) {
+            return res.status(409).json({
+              success: 0,
+              message: 'Invalid invitation code',
+            });
+          } else {
+            const eventID = result.event_id;
+            event_service.checkJoinEvent(
+              {
+                user_id: body.user_id,
+                event_id: result.event_id,
+              },
+              (err, result) => {
+                if (result) {
+                  return res.status(409).json({
+                    success: 0,
+                    message: 'Event already exists!',
+                    data: result,
+                  });
+                } else {
+                  event_service.joinEvent(
+                    {
+                      event_id: eventID,
+                      user_id: body.user_id,
+                      join_time: new Date(),
+                    },
+                    (err, result) => {
+                      if (err) {
+                        console.log(err);
+                        return res.status(500).json({
+                          success: 0,
+                          message: 'Server connection failure',
+                        });
+                      }
+                      return res.status(200).json({
+                        success: 1,
+                        message: 'Event join Successfully',
                       });
                     }
-                    return res.status(200).json({
-                      success: 1,
-                      message: 'Event join Successfully',
-                    });
-                  }
-                );
+                  );
+                }
               }
-            })
+            );
+          }
         }
-      })
+      );
     } catch (error) {
       console.log(err);
       return res.status(500).json({

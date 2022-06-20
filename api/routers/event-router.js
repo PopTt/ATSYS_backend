@@ -33,6 +33,11 @@ router.post(
   [checkWebToken, checkRoles(ROLES.Admin)],
   event_controller.createEvent
 );
+router.post(
+  '/update',
+  [checkWebToken, checkRoles(ROLES.Admin)],
+  event_controller.updateEvent
+);
 router.post('/join', [checkWebToken], event_controller.joinEvent);
 router.post(
   '/addEventInstructors',

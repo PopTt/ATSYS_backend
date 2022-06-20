@@ -152,8 +152,8 @@ module.exports = {
 
   updateEvent: (data, callBack) => {
     db.query(
-      `UPDATE event SET event_description = ? WHERE event_id = ?`,
-      [data.event_description, data.event_id],
+      `UPDATE event SET event_name = ?, event_description = ? WHERE event_id = ?`,
+      [data.event_name, data.event_description, data.event_id],
       (err, result) => {
         if (err) {
           callBack(err);
