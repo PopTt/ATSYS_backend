@@ -219,16 +219,33 @@ module.exports = {
   updateUserAttendanceStatus: (req, res) => {
     try {
       const body = req.body;
-      attendance_service.updateUserAttendance(body, (err, result) => {
+      const currentDate = new Date()
+      body["attendance_time"] = currentDate
+      attendance_service.getAttendanceByAID(body.attendance_id, (err, result) => {
         if (err) {
           throw new Error(err);
         }
-
-        return res.status(200).json({
-          success: 1,
-          message: 'update User Attendance Status Successfully',
-        });
-      });
+        if(currentDate > result.start_time && currentDate < result.end_time){
+          attendance_service.updateUserAttendance(body, (err, result) => {
+            if (err) {
+              throw new Error(err);
+            }
+    
+            return res.status(200).json({
+              success: 1,
+              message: 'update User Attendance Status Successfully'
+            });
+          });
+        }else{
+          //console.log(currentDate)
+          //console.log(result.start_time)
+          //console.log(result.end_time)
+          return res.status(409).json({
+            success: 0,
+            message: 'Not in valid datetime range'
+          });
+        }
+      })
     } catch (err) {
       console.log(err);
       return res.status(500).json({

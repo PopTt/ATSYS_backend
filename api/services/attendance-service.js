@@ -64,6 +64,19 @@ module.exports = {
     );
   },
 
+  getAttendanceByAID: (attendance_id, callBack) => {
+    db.query(
+      `SELECT attendance_name, start_time, end_time FROM attendance WHERE attendance_id = ?`,
+      [attendance_id],
+      (err, result) => {
+        if (err) {
+          callBack(err);
+        }
+        return callBack(null, result[0]);
+      }
+    );
+  },
+
   createFlash: (data, callBack) => {
     db.query(
       `INSERT INTO flash (flash_question, flash_ans, creator_id, attendance_id) VALUES (?, ?, ?, ?)`,
@@ -144,9 +157,10 @@ module.exports = {
 
   updateUserAttendance: (data, callBack) => {
     db.query(
-      `UPDATE user_attendance SET attendance_status = ? WHERE user_id = ? AND attendance_id = ?`,
+      `UPDATE user_attendance SET attendance_status = ?, attendance_time = ? WHERE user_id = ? AND attendance_id = ?`,
       [
-        data.attendance_status, 
+        data.attendance_status,
+        data.attendance_time, 
         data.user_id,
         data.attendance_id
       ],
