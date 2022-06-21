@@ -68,7 +68,7 @@ module.exports = {
             { login_result: result },
             process.env.TOKEN_SECRET,
             {
-              expiresIn: '30m',
+              expiresIn: '1h',
             }
           );
 

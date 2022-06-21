@@ -181,7 +181,7 @@ module.exports = {
   removeEventMember: (req, res) => {
     try {
       const body = req.body;
-      event_service.removeEventMember(body, (err, _) => {
+      event_service.removeEventMember(body, (err, result) => {
         if (err) {
           throw new Error(err);
         }

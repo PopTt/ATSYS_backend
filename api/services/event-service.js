@@ -214,4 +214,20 @@ module.exports = {
       }
     );
   },
+
+  getUserByRoleByEventId: (data, callBack) => {
+    db.query(
+      `SELECT u.user_id, u.first_name, u.last_name, u.email FROM user u, user_event ue WHERE ue.event_id = ? AND ue.user_id = u.user_id AND u.permission_type = ?`,
+      [
+        data.event_id,
+        data.permission_type
+      ],
+      (err, result) => {
+        if (err) {
+          callBack(err);
+        }
+        return callBack(null, result);
+      }
+    );
+  }
 };
