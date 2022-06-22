@@ -22,8 +22,8 @@ module.exports = {
 
   updateAttendanceByAttendanceID: (data, callBack) => {
     db.query(
-      `UPDATE attendance SET attendance_name = ? WHERE attendance_id = ?`,
-      [data.attendance_name, data.attendance_id],
+      `UPDATE attendance SET attendance_name = ?, attendance_type = ? WHERE attendance_id = ?`,
+      [data.attendance_name, data.attendance_type, data.attendance_id],
       (err, result) => {
         if (err) {
           callBack(err);
@@ -61,7 +61,7 @@ module.exports = {
 
   getAttendanceByAID: (attendance_id, callBack) => {
     db.query(
-      `SELECT attendance_id, attendance_name, start_time, end_time FROM attendance WHERE attendance_id = ?`,
+      `SELECT attendance_id, attendance_name, start_time, end_time, attendance_type FROM attendance WHERE attendance_id = ?`,
       [attendance_id],
       (err, result) => {
         if (err) {
