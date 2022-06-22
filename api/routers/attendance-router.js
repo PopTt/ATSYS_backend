@@ -7,6 +7,12 @@ const { checkWebToken } = require('../../middlewares-auth/verify-jwt');
 const checkRoles = require('../../middlewares-auth/verify-role');
 
 router.get(
+  '/getAttendance/:attendance_id',
+  checkWebToken,
+  attendance_controller.getAttendance
+);
+
+router.get(
   '/getEventAttendances/:event_id',
   checkWebToken,
   attendance_controller.getEventAttendances
@@ -24,6 +30,12 @@ router.post(
   attendance_controller.createAttendance
 );
 
+router.post(
+  '/updateAttendance',
+  [checkWebToken, checkRoles(ROLES.Admin, ROLES.Instructor)],
+  attendance_controller.updateAttendance
+);
+
 router.get(
   '/getQRCode/:attendance_id',
   checkWebToken,
@@ -34,6 +46,12 @@ router.post(
   '/createFlash',
   [checkWebToken, checkRoles(ROLES.Admin, ROLES.Instructor)],
   attendance_controller.createFlash
+);
+
+router.post(
+  '/updateFlash',
+  [checkWebToken, checkRoles(ROLES.Admin, ROLES.Instructor)],
+  attendance_controller.updateFlash
 );
 
 router.get(
@@ -65,4 +83,17 @@ router.post(
   [checkWebToken, checkRoles(ROLES.User)],
   attendance_controller.updateUserAttendanceStatus
 );
+
+router.post(
+  '/updateStatus',
+  [checkWebToken, checkRoles(ROLES.Admin, ROLES.Instructor)],
+  attendance_controller.updateUserAttendanceStatusManually
+);
+
+router.delete(
+  '/deleteAttendance',
+  [checkWebToken, checkRoles(ROLES.Admin)],
+  attendance_controller.deleteAttendance
+);
+
 module.exports = router;
