@@ -32,7 +32,7 @@ module.exports = {
   updateAttendance: (req, res) => {
     try {
       const body = req.body;
-      attendance_service.updateAttendanceByAttendanceID(body, (err, result) => {
+      attendance_service.getFlashByAttendanceId(body.attendance_id, (err, result) => {
         if (err) {
           console.log(err);
           return res.status(500).json({
@@ -40,12 +40,28 @@ module.exports = {
             message: 'Server connection failure',
           });
         }
-        return res.status(200).json({
-          success: 1,
-          message: 'Attendance Update Successfully',
-          data: result,
-        });
-      });
+        if(result.length == 0 && body.attendance_type == '1'){
+          return res.status(409).json({
+            success: 0,
+            message: 'Flash Question is empty! Attendance Type cannot be flash question type.',
+          });
+        }else {
+          attendance_service.updateAttendanceByAttendanceID(body, (err, result) => {
+            if (err) {
+              console.log(err);
+              return res.status(500).json({
+                success: 0,
+                message: 'Server connection failure',
+              });
+            }
+            return res.status(200).json({
+              success: 1,
+              message: 'Attendance Update Successfully',
+              data: result,
+            });
+          });
+        }
+      })
     } catch (err) {
       console.log(err);
       return res.status(500).json({
