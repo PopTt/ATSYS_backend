@@ -48,8 +48,21 @@ module.exports = {
 
   getUsersEventAttendances: (attendance_id, callBack) => {
     db.query(
-      `SELECT u.user_id, u.first_name, u.last_name, u.email, ua.attendance_status, ua.ua_id, ua.attendance_time FROM user u, user_attendance ua, attendance a WHERE u.user_id = ua.user_id AND ua.attendance_id = a.attendance_id AND ua.attendance_id = ?`,
+      `SELECT u.user_id, u.first_name, u.last_name, u.email, ua.attendance_id, ua.attendance_status, ua.ua_id, ua.attendance_time, ua.flash_result FROM user u, user_attendance ua, attendance a WHERE u.user_id = ua.user_id AND ua.attendance_id = a.attendance_id AND ua.attendance_id = ?`,
       [attendance_id],
+      (err, result) => {
+        if (err) {
+          callBack(err);
+        }
+        return callBack(null, result);
+      }
+    );
+  },
+
+  getUsersEventAttendancesByUID: (user_id, callBack) => {
+    db.query(
+      `SELECT u.user_id, u.first_name, u.last_name, u.email, ua.attendance_id, ua.attendance_status, ua.ua_id, ua.attendance_time, ua.flash_result FROM user u, user_attendance ua, attendance a WHERE u.user_id = ua.user_id AND ua.attendance_id = a.attendance_id AND ua.user_id = ?`,
+      [user_id],
       (err, result) => {
         if (err) {
           callBack(err);

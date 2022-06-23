@@ -24,6 +24,12 @@ router.get(
   attendance_controller.getUsersEventAttendances
 );
 
+router.get(
+  '/getAttendanceHistory/:user_id',
+  checkWebToken,
+  attendance_controller.getAttendancesHistoryByUID
+);
+
 router.post(
   '/create',
   [checkWebToken, checkRoles(ROLES.Admin, ROLES.Instructor)],

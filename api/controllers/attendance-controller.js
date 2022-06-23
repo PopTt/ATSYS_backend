@@ -164,6 +164,33 @@ module.exports = {
     }
   },
 
+  getAttendancesHistoryByUID: (req, res) => {
+    try {
+      const user_id = req.params.user_id;
+
+      attendance_service.getUsersEventAttendancesByUID(
+        user_id,
+        (err, result) => {
+          if (err) {
+            throw new Error(err);
+          }
+
+          return res.status(200).json({
+            success: 1,
+            message: 'Get Attendances history Successfully',
+            data: result,
+          });
+        }
+      );
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        success: 0,
+        message: 'Internal Server Error',
+      });
+    }
+  },
+
   getAttendanceQRCode: async (req, res) => {
     try {
       const attendace_id = req.params.attendance_id;
