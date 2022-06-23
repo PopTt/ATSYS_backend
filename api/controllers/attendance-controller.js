@@ -194,6 +194,7 @@ module.exports = {
   getAttendancesHistoryByUIDAndEid: (req, res) => {
     try {
       const body = req.body;
+      const currentDate = new Date()
 
       attendance_service.getUsersEventAttendancesByUIDAndEID(
         body,
@@ -201,11 +202,19 @@ module.exports = {
           if (err) {
             throw new Error(err);
           }
-
+          const attendances = result;
+          attendances.map((item) => {
+            item['status'] = 'Pending';
+            if (currentDate > item.start_time && currentDate < item.end_time) {
+              item['status'] = 'Active';
+            } else if (currentDate > item.end_time) {
+              item['status'] = 'Expired';
+            }
+          });
           return res.status(200).json({
             success: 1,
             message: 'Get Attendances history Successfully',
-            data: result,
+            data: attendances,
           });
         }
       );
