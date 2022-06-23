@@ -100,16 +100,29 @@ module.exports = {
   getEventAttendances: (req, res) => {
     try {
       const event_id = req.params.event_id;
+      const currentDate = new Date()
 
       attendance_service.getEventAttendances(event_id, (err, result) => {
         if (err) {
           throw new Error(err);
         }
-
+        const attendances = result
+        attendances.map((item) => {
+          item["status"] = 'pedding'
+          if (
+            currentDate > item.start_time &&
+            currentDate < item.end_time
+          ){
+            item["status"] = 'active'
+          }else if(currentDate > item.end_time){
+            item["status"] = 'expired'
+          }
+        });
+        console.log(attendances)
         return res.status(200).json({
           success: 1,
           message: 'Get Event Attendances Success',
-          data: result,
+          data: attendances,
         });
       });
     } catch (err) {
