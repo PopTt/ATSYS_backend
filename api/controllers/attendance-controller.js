@@ -108,7 +108,7 @@ module.exports = {
         }
         const attendances = result
         attendances.map((item) => {
-          item["status"] = 'pedding'
+          item["status"] = 'pending'
           if (
             currentDate > item.start_time &&
             currentDate < item.end_time
@@ -118,7 +118,6 @@ module.exports = {
             item["status"] = 'expired'
           }
         });
-        console.log(attendances)
         return res.status(200).json({
           success: 1,
           message: 'Get Event Attendances Success',
