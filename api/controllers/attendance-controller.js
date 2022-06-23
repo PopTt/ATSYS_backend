@@ -32,36 +32,43 @@ module.exports = {
   updateAttendance: (req, res) => {
     try {
       const body = req.body;
-      attendance_service.getFlashByAttendanceId(body.attendance_id, (err, result) => {
-        if (err) {
-          console.log(err);
-          return res.status(500).json({
-            success: 0,
-            message: 'Server connection failure',
-          });
-        }
-        if(result.length == 0 && body.attendance_type == '1'){
-          return res.status(409).json({
-            success: 0,
-            message: 'Flash Question is empty! Attendance Type cannot be flash question type.',
-          });
-        }else {
-          attendance_service.updateAttendanceByAttendanceID(body, (err, result) => {
-            if (err) {
-              console.log(err);
-              return res.status(500).json({
-                success: 0,
-                message: 'Server connection failure',
-              });
-            }
-            return res.status(200).json({
-              success: 1,
-              message: 'Attendance Update Successfully',
-              data: result,
+      attendance_service.getFlashByAttendanceId(
+        body.attendance_id,
+        (err, result) => {
+          if (err) {
+            console.log(err);
+            return res.status(500).json({
+              success: 0,
+              message: 'Server connection failure',
             });
-          });
+          }
+          if (result.length == 0 && body.attendance_type == '1') {
+            return res.status(409).json({
+              success: 0,
+              message:
+                'Flash Question is empty! Attendance Type cannot be flash question type.',
+            });
+          } else {
+            attendance_service.updateAttendanceByAttendanceID(
+              body,
+              (err, result) => {
+                if (err) {
+                  console.log(err);
+                  return res.status(500).json({
+                    success: 0,
+                    message: 'Server connection failure',
+                  });
+                }
+                return res.status(200).json({
+                  success: 1,
+                  message: 'Attendance Update Successfully',
+                  data: result,
+                });
+              }
+            );
+          }
         }
-      })
+      );
     } catch (err) {
       console.log(err);
       return res.status(500).json({
@@ -100,22 +107,19 @@ module.exports = {
   getEventAttendances: (req, res) => {
     try {
       const event_id = req.params.event_id;
-      const currentDate = new Date()
+      const currentDate = new Date();
 
       attendance_service.getEventAttendances(event_id, (err, result) => {
         if (err) {
           throw new Error(err);
         }
-        const attendances = result
+        const attendances = result;
         attendances.map((item) => {
-          item["status"] = 'pending'
-          if (
-            currentDate > item.start_time &&
-            currentDate < item.end_time
-          ){
-            item["status"] = 'active'
-          }else if(currentDate > item.end_time){
-            item["status"] = 'expired'
+          item['status'] = 'Pending';
+          if (currentDate > item.start_time && currentDate < item.end_time) {
+            item['status'] = 'Active';
+          } else if (currentDate > item.end_time) {
+            item['status'] = 'Expired';
           }
         });
         return res.status(200).json({
