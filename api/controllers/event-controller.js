@@ -1,4 +1,5 @@
 const event_service = require('../services/event-service');
+const attendance_service = require('../services/attendance-service');
 
 function generateInvitationCode(event_id) {
   let secret = event_id.toString();
@@ -157,10 +158,28 @@ module.exports = {
                           message: 'Server connection failure',
                         });
                       }
-                      return res.status(200).json({
-                        success: 1,
-                        message: 'Event join Successfully',
-                      });
+                      attendance_service.getEventAttendances(eventID, (err, result) => {
+                        if (err) {
+                          console.log(err);
+                          return res.status(500).json({
+                            success: 0,
+                            message: 'Server connection failure',
+                          });
+                        }
+                        if(result){
+                          result.map((item) => {
+                            attendance_service.insertUserAttendance({
+                              user_id: body.user_id, 
+                              attendance_id: item.attendance_id, 
+                              attendance_status: '0'
+                            })
+                          })
+                          return res.status(200).json({
+                            success: 1,
+                            message: 'Event join Successfully',
+                          });
+                        }
+                      })
                     }
                   );
                 }

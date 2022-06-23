@@ -191,6 +191,33 @@ module.exports = {
     }
   },
 
+  getAttendancesHistoryByUIDAndEid: (req, res) => {
+    try {
+      const body = req.body;
+
+      attendance_service.getUsersEventAttendancesByUIDAndEID(
+        body,
+        (err, result) => {
+          if (err) {
+            throw new Error(err);
+          }
+
+          return res.status(200).json({
+            success: 1,
+            message: 'Get Attendances history Successfully',
+            data: result,
+          });
+        }
+      );
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        success: 0,
+        message: 'Internal Server Error',
+      });
+    }
+  },
+
   getAttendanceQRCode: async (req, res) => {
     try {
       const attendace_id = req.params.attendance_id;
@@ -412,6 +439,29 @@ module.exports = {
         return res.status(200).json({
           success: 1,
           message: 'update User Attendance Status Successfully',
+        });
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        success: 0,
+        message: 'Internal Server Error',
+      });
+    }
+  },
+
+  updateFlashResult: (req, res) => {
+    try {
+      const body = req.body;
+
+      attendance_service.updateFlashResultByUAId(body, (err, result) => {
+        if (err) {
+          throw new Error(err);
+        }
+
+        return res.status(200).json({
+          success: 1,
+          message: 'Submitted',
         });
       });
     } catch (err) {

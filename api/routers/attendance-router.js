@@ -30,6 +30,12 @@ router.get(
   attendance_controller.getAttendancesHistoryByUID
 );
 
+router.get(
+  '/event/getAttendanceHistory/',
+  checkWebToken,
+  attendance_controller.getAttendancesHistoryByUIDAndEid
+);
+
 router.post(
   '/create',
   [checkWebToken, checkRoles(ROLES.Admin, ROLES.Instructor)],
@@ -58,6 +64,12 @@ router.post(
   '/updateFlash',
   [checkWebToken, checkRoles(ROLES.Admin, ROLES.Instructor)],
   attendance_controller.updateFlash
+);
+
+router.post(
+  '/updateFlashResult',
+  [checkWebToken],
+  attendance_controller.updateFlashResult
 );
 
 router.get(
