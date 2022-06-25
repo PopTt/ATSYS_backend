@@ -31,7 +31,7 @@ router.get(
 );
 
 router.get(
-  '/event/getAttendanceHistory/',
+  '/event/getAttendanceHistory/:event_id/:user_id',
   checkWebToken,
   attendance_controller.getAttendancesHistoryByUIDAndEid
 );

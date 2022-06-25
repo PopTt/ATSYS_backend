@@ -193,11 +193,15 @@ module.exports = {
 
   getAttendancesHistoryByUIDAndEid: (req, res) => {
     try {
-      const body = req.body;
+      const event_id = req.params.event_id
+      const user_id = req.params.user_id
       const currentDate = new Date()
 
       attendance_service.getUsersEventAttendancesByUIDAndEID(
-        body,
+        {
+          event_id: event_id,
+          user_id: user_id
+        },
         (err, result) => {
           if (err) {
             throw new Error(err);
