@@ -48,7 +48,7 @@ module.exports = {
 
   getUsersEventAttendances: (attendance_id, callBack) => {
     db.query(
-      `SELECT u.user_id, u.first_name, u.last_name, u.email, ua.attendance_id, ua.attendance_status, ua.ua_id, ua.attendance_time, ua.flash_result, a.attendance_type FROM user u, user_attendance ua, attendance a WHERE u.user_id = ua.user_id AND ua.attendance_id = a.attendance_id AND ua.attendance_id = ?`,
+      `SELECT u.user_id, u.first_name, u.last_name, u.email, ua.attendance_id, ua.attendance_status, ua.ua_id, ua.attendance_time, ua.flash_result, ua.location, a.attendance_type FROM user u, user_attendance ua, attendance a WHERE u.user_id = ua.user_id AND ua.attendance_id = a.attendance_id AND ua.attendance_id = ?`,
       [attendance_id],
       (err, result) => {
         if (err) {
@@ -61,7 +61,7 @@ module.exports = {
 
   getUsersEventAttendancesByUID: (user_id, callBack) => {
     db.query(
-      `SELECT u.user_id, u.first_name, u.last_name, u.email, ua.attendance_id, ua.attendance_status, ua.ua_id, ua.attendance_time, ua.flash_result, a.attendance_name, a.start_time, a.end_time, a.attendance_type, a.event_id FROM user u, user_attendance ua, attendance a WHERE u.user_id = ua.user_id AND ua.attendance_id = a.attendance_id AND a.isDeleted = 0 AND ua.user_id = ?`,
+      `SELECT u.user_id, u.first_name, u.last_name, u.email, ua.attendance_id, ua.attendance_status, ua.ua_id, ua.attendance_time, ua.flash_result, ua.location, a.attendance_name, a.start_time, a.end_time, a.attendance_type, a.event_id FROM user u, user_attendance ua, attendance a WHERE u.user_id = ua.user_id AND ua.attendance_id = a.attendance_id AND a.isDeleted = 0 AND ua.user_id = ?`,
       [user_id],
       (err, result) => {
         if (err) {
@@ -182,10 +182,11 @@ module.exports = {
 
   updateUserAttendance: (data, callBack) => {
     db.query(
-      `UPDATE user_attendance SET attendance_status = ?, attendance_time = ? WHERE user_id = ? AND attendance_id = ?`,
+      `UPDATE user_attendance SET attendance_status = ?, attendance_time = ?, location = ? WHERE user_id = ? AND attendance_id = ?`,
       [
         data.attendance_status,
         data.attendance_time,
+        data.location,
         data.user_id,
         data.attendance_id,
       ],
