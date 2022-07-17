@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const { sign, verify, decode } = require('jsonwebtoken');
+const { sign } = require('jsonwebtoken');
 const user_service = require('../services/user-service');
 const dotenv = require('dotenv');
 
@@ -51,7 +51,10 @@ module.exports = {
       user_service.login(body.email, (err, result) => {
         if (err) {
           console.log(err);
-          throw new Error();
+          return res.status(500).json({
+            success: 0,
+            message: 'Database Error',
+          });
         }
         if (!result) {
           return res.status(401).json({
@@ -106,7 +109,10 @@ module.exports = {
     user_service.getUserByUID(user_id, (err, result) => {
       if (err) {
         console.log(err);
-        throw new Error();
+        return res.status(500).json({
+          success: 0,
+          message: 'Database Error',
+        });
       }
       if (!result) {
         return res.status(401).json({
@@ -127,7 +133,10 @@ module.exports = {
       user_service.getInstructorsByAdminId(admin_id, (err, result) => {
         if (err) {
           console.log(err);
-          throw new Error();
+          return res.status(500).json({
+            success: 0,
+            message: 'Database Error',
+          });
         }
         return res.status(200).json({
           success: 1,
@@ -147,7 +156,10 @@ module.exports = {
     user_service.getUser((err, result) => {
       if (err) {
         console.log(err);
-        return;
+        return res.status(500).json({
+          success: 0,
+          message: 'Database Error',
+        });
       }
       if (!result) {
         return res.json({
@@ -238,7 +250,10 @@ module.exports = {
       user_service.deleteUser(body, (err, result) => {
         if (err) {
           console.log(err);
-          return;
+          return res.status(500).json({
+            success: 0,
+            message: 'Database Error',
+          });
         }
         if (!result) {
           return res.json({

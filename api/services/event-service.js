@@ -16,10 +16,11 @@ module.exports = {
 
   createEvent: (data, callBack) => {
     db.query(
-      `INSERT INTO event (event_name, event_description, established_time, admin_id) VALUES (?, ?, ?, ?)`,
+      `INSERT INTO event (event_name, event_description, event_type, established_time, admin_id) VALUES (?, ?, ?, ?, ?)`,
       [
         data.event_name,
         data.event_description,
+        data.event_type,
         data.established_time,
         data.admin_id,
       ],
@@ -34,7 +35,7 @@ module.exports = {
 
   getEvent: (event_id, callBack) => {
     db.query(
-      `SELECT event_id, event_name, event_description, established_time, admin_id FROM event WHERE event_id = ?`,
+      `SELECT event_id, event_name, event_description, event_type, established_time, admin_id FROM event WHERE event_id = ?`,
       [event_id],
       (err, result) => {
         if (err) {
@@ -60,7 +61,7 @@ module.exports = {
 
   getEvents: (admin_id, callBack) => {
     db.query(
-      `SELECT event_id, event_name, event_description FROM event WHERE admin_id = ?`,
+      `SELECT event_id, event_name, event_description, event_type FROM event WHERE admin_id = ?`,
       [admin_id],
       (err, result) => {
         if (err) {
@@ -73,7 +74,7 @@ module.exports = {
 
   getUserEvents: (user_id, callBack) => {
     db.query(
-      `SELECT e.event_id, e.event_name, e.event_description, e.established_time, e.admin_id FROM user u, user_event ue, event e WHERE u.user_id = ue.user_id AND ue.event_id = e.event_id AND ue.user_id = ?`,
+      `SELECT e.event_id, e.event_name, e.event_description, e.event_type, e.established_time, e.admin_id FROM user u, user_event ue, event e WHERE u.user_id = ue.user_id AND ue.event_id = e.event_id AND ue.user_id = ?`,
       [user_id],
       (err, result) => {
         if (err) {
@@ -126,7 +127,7 @@ module.exports = {
   getNotInEventInstructors: (admin_id, event_id, callBack) => {
     db.query(
       `SELECT user.user_id, user.first_name, user.last_name, user.email FROM user LEFT JOIN user_event ON user.user_id = user_event.user_id
-      WHERE user.admin_id = ? AND (user_event.event_id != ? OR user_event.event_id IS NULL)`,
+      WHERE user.admin_id = ? AND user.status = 0 AND (user_event.event_id != ? OR user_event.event_id IS NULL)`,
       [admin_id, event_id],
       (err, result) => {
         if (err) {
@@ -165,8 +166,8 @@ module.exports = {
 
   updateEvent: (data, callBack) => {
     db.query(
-      `UPDATE event SET event_name = ?, event_description = ? WHERE event_id = ?`,
-      [data.event_name, data.event_description, data.event_id],
+      `UPDATE event SET event_name = ?, event_description = ?, event_type = ? WHERE event_id = ?`,
+      [data.event_name, data.event_description, data.event_type, data.event_id],
       (err, result) => {
         if (err) {
           callBack(err);
@@ -218,10 +219,7 @@ module.exports = {
   getUserByRoleByEventId: (data, callBack) => {
     db.query(
       `SELECT u.user_id, u.first_name, u.last_name, u.email FROM user u, user_event ue WHERE ue.event_id = ? AND ue.user_id = u.user_id AND u.permission_type = ?`,
-      [
-        data.event_id,
-        data.permission_type
-      ],
+      [data.event_id, data.permission_type],
       (err, result) => {
         if (err) {
           callBack(err);
@@ -229,5 +227,5 @@ module.exports = {
         return callBack(null, result);
       }
     );
-  }
+  },
 };

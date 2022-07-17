@@ -49,6 +49,12 @@ router.post(
 );
 
 router.get(
+  '/getUserAttendanceHistories/:user_id/:event_id',
+  checkWebToken,
+  attendance_controller.getUserAttendanceHistories
+);
+
+router.get(
   '/getQRCode/:attendance_id',
   checkWebToken,
   attendance_controller.getAttendanceQRCode
@@ -98,7 +104,7 @@ router.post(
 
 router.post(
   '/signAttendance/',
-  [checkWebToken, checkRoles(ROLES.User)],
+  [checkWebToken, checkRoles(ROLES.Student)],
   attendance_controller.updateUserAttendanceStatus
 );
 
