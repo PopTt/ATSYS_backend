@@ -49,5 +49,10 @@ router.post(
   [checkWebToken, checkRoles(ROLES.Admin)],
   event_controller.addEventInstructors
 );
+router.post(
+  '/addEventStudents',
+  [checkWebToken, checkRoles(ROLES.Instructor)],
+  event_controller.addEventStudents
+);
 
 module.exports = router;

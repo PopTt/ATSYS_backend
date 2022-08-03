@@ -124,6 +124,19 @@ module.exports = {
     );
   },
 
+  checkJoinEventByEmails: (data, callBack) => {
+    db.query(
+      `SELECT user.user_id FROM user WHERE user.email IN (?) AND NOT EXISTS (SELECT user_event.user_id FROM user_event WHERE user_event.user_id = user.user_id AND user.status = 0 AND user_event.event_id = ?)`,
+      [data.emails, data.event_id],
+      (err, result) => {
+        if (err) {
+          return callBack(err);
+        }
+        return callBack(null, result);
+      }
+    );
+  },
+
   getNotInEventInstructors: (admin_id, event_id, callBack) => {
     db.query(
       `SELECT user.user_id, user.first_name, user.last_name, user.email FROM user LEFT JOIN user_event ON user.user_id = user_event.user_id

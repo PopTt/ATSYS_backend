@@ -21,6 +21,79 @@ function generateInvitationCode(event_id) {
 }
 
 module.exports = {
+  addEventStudents: (req, res) => {
+    try {
+      const body = req.body;
+      const emails = body.emails;
+      const event_id = body.event;
+
+      event_service.checkJoinEventByEmails(
+        {
+          event_id: event_id,
+          emails: emails,
+        },
+        (err, result) => {
+          if (err) {
+            console.log(err);
+            return res.status(500).json({
+              success: 0,
+              message: 'Database Error',
+            });
+          }
+
+          attendance_service.getEventAttendances(
+            event_id,
+            (err, attendances) => {
+              if (err) {
+                return res.status(500).json({
+                  success: 0,
+                  message: 'Server connection failure',
+                });
+              }
+              if (attendances) {
+                var ids = Object.values(JSON.parse(JSON.stringify(result)));
+                ids.forEach((id) => {
+                  event_service.joinEvent(
+                    {
+                      event_id: event_id,
+                      user_id: id.user_id,
+                      join_time: new Date(),
+                    },
+                    (err, _) => {
+                      if (err) {
+                        return res.status(500).json({
+                          success: 0,
+                          message: 'Server connection failure',
+                        });
+                      }
+                      attendances.map((item) => {
+                        attendance_service.insertUserAttendance({
+                          user_id: id.user_id,
+                          attendance_id: item.attendance_id,
+                          attendance_status: '0',
+                        });
+                      });
+                    }
+                  );
+                });
+                return res.status(200).json({
+                  success: 1,
+                  message: 'Event Students Added Successfully',
+                });
+              }
+            }
+          );
+        }
+      );
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        success: 0,
+        message: 'Internal Server Error',
+      });
+    }
+  },
+
   addEventInstructors: (req, res) => {
     try {
       const body = req.body;
