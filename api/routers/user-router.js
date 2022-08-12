@@ -32,7 +32,7 @@ router.post('/logout', checkWebToken, user_controller.logout);
 router.post('/login', user_controller.login);
 router.post(
   '/android/login',
-  checkRoles(ROLES.Instructor, ROLES.User),
+  checkRoles(ROLES.Instructor, ROLES.Student),
   user_controller.login
 );
 

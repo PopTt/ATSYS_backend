@@ -111,7 +111,11 @@ module.exports = {
 
       attendance_service.getEventAttendances(event_id, (err, result) => {
         if (err) {
-          throw new Error(err);
+          console.log(err);
+          return res.status(500).json({
+            success: 0,
+            message: 'Database Error',
+          });
         }
         const attendances = result;
         attendances.map((item) => {
@@ -145,7 +149,11 @@ module.exports = {
         attendace_id,
         (err, result) => {
           if (err) {
-            throw new Error(err);
+            console.log(err);
+            return res.status(500).json({
+              success: 0,
+              message: 'Database Error',
+            });
           }
 
           return res.status(200).json({
@@ -172,7 +180,11 @@ module.exports = {
         user_id,
         (err, result) => {
           if (err) {
-            throw new Error(err);
+            console.log(err);
+            return res.status(500).json({
+              success: 0,
+              message: 'Database Error',
+            });
           }
 
           return res.status(200).json({
@@ -193,18 +205,22 @@ module.exports = {
 
   getAttendancesHistoryByUIDAndEid: (req, res) => {
     try {
-      const event_id = req.params.event_id
-      const user_id = req.params.user_id
-      const currentDate = new Date()
+      const event_id = req.params.event_id;
+      const user_id = req.params.user_id;
+      const currentDate = new Date();
 
       attendance_service.getUsersEventAttendancesByUIDAndEID(
         {
           event_id: event_id,
-          user_id: user_id
+          user_id: user_id,
         },
         (err, result) => {
           if (err) {
-            throw new Error(err);
+            console.log(err);
+            return res.status(500).json({
+              success: 0,
+              message: 'Database Error',
+            });
           }
           const attendances = result;
           attendances.map((item) => {
@@ -219,6 +235,38 @@ module.exports = {
             success: 1,
             message: 'Get Attendances history Successfully',
             data: attendances,
+          });
+        }
+      );
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        success: 0,
+        message: 'Internal Server Error',
+      });
+    }
+  },
+
+  getUserAttendanceHistories: (req, res) => {
+    try {
+      const user_id = req.params.user_id;
+      const event_id = req.params.event_id;
+
+      attendance_service.getUserAttendanceHistories(
+        { user_id: user_id, event_id: event_id },
+        (err, result) => {
+          if (err) {
+            console.log(err);
+            return res.status(500).json({
+              success: 0,
+              message: 'Database Error',
+            });
+          }
+
+          return res.status(200).json({
+            success: 1,
+            message: 'Get User Attendance Histories Success',
+            data: result,
           });
         }
       );
@@ -315,7 +363,11 @@ module.exports = {
         attendance_id,
         (err, result) => {
           if (err) {
-            throw new Error(err);
+            console.log(err);
+            return res.status(500).json({
+              success: 0,
+              message: 'Database Error',
+            });
           }
 
           return res.status(200).json({
@@ -338,6 +390,14 @@ module.exports = {
     try {
       const body = req.body;
       attendance_service.checkFlashAns(body, (err, result) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).json({
+            success: 0,
+            message: 'Database Error',
+          });
+        }
+
         if (result) {
           return res.status(200).json({
             success: 1,
@@ -369,6 +429,14 @@ module.exports = {
           permission_type: '2',
         },
         (err, result) => {
+          if (err) {
+            console.log(err);
+            return res.status(500).json({
+              success: 0,
+              message: 'Database Error',
+            });
+          }
+
           if (result) {
             const users = result;
             users.map((item) => {
@@ -403,7 +471,11 @@ module.exports = {
         body.attendance_id,
         (err, result) => {
           if (err) {
-            throw new Error(err);
+            console.log(err);
+            return res.status(500).json({
+              success: 0,
+              message: 'Database Error',
+            });
           }
           if (
             currentDate > result.start_time &&
@@ -411,7 +483,11 @@ module.exports = {
           ) {
             attendance_service.updateUserAttendance(body, (err, result) => {
               if (err) {
-                throw new Error(err);
+                console.log(err);
+                return res.status(500).json({
+                  success: 0,
+                  message: 'Database Error',
+                });
               }
 
               return res.status(200).json({
@@ -446,7 +522,11 @@ module.exports = {
 
       attendance_service.updateUserAttendanceByUAId(body, (err, result) => {
         if (err) {
-          throw new Error(err);
+          console.log(err);
+          return res.status(500).json({
+            success: 0,
+            message: 'Database Error',
+          });
         }
 
         return res.status(200).json({
@@ -469,7 +549,11 @@ module.exports = {
 
       attendance_service.updateFlashResultByUAId(body, (err, result) => {
         if (err) {
-          throw new Error(err);
+          console.log(err);
+          return res.status(500).json({
+            success: 0,
+            message: 'Database Error',
+          });
         }
 
         return res.status(200).json({
@@ -493,7 +577,10 @@ module.exports = {
       attendance_service.deleteAttendance(body.attendance_id, (err, result) => {
         if (err) {
           console.log(err);
-          return;
+          return res.status(500).json({
+            success: 0,
+            message: 'Database Error',
+          });
         }
 
         return res.json({

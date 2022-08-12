@@ -20,16 +20,80 @@ function generateInvitationCode(event_id) {
   return invitation_code;
 }
 
-function convertBackEventId(invitation_code) {
-  let target = invitation_code.slice(-1);
-  let backTrash = parseInt(target) + 1;
-  let half = invitation_code.slice(0, -backTrash);
-  let orginal_code = half.substring(parseInt(target));
-
-  return orginal_code;
-}
-
 module.exports = {
+  addEventStudents: (req, res) => {
+    try {
+      const body = req.body;
+      const emails = body.emails;
+      const event_id = body.event;
+
+      event_service.checkJoinEventByEmails(
+        {
+          event_id: event_id,
+          emails: emails,
+        },
+        (err, result) => {
+          if (err) {
+            console.log(err);
+            return res.status(500).json({
+              success: 0,
+              message: 'Database Error',
+            });
+          }
+
+          attendance_service.getEventAttendances(
+            event_id,
+            (err, attendances) => {
+              if (err) {
+                return res.status(500).json({
+                  success: 0,
+                  message: 'Server connection failure',
+                });
+              }
+              if (attendances) {
+                var ids = Object.values(JSON.parse(JSON.stringify(result)));
+                ids.forEach((id) => {
+                  event_service.joinEvent(
+                    {
+                      event_id: event_id,
+                      user_id: id.user_id,
+                      join_time: new Date(),
+                    },
+                    (err, _) => {
+                      if (err) {
+                        return res.status(500).json({
+                          success: 0,
+                          message: 'Server connection failure',
+                        });
+                      }
+                      attendances.map((item) => {
+                        attendance_service.insertUserAttendance({
+                          user_id: id.user_id,
+                          attendance_id: item.attendance_id,
+                          attendance_status: '0',
+                        });
+                      });
+                    }
+                  );
+                });
+                return res.status(200).json({
+                  success: 1,
+                  message: 'Event Students Added Successfully',
+                });
+              }
+            }
+          );
+        }
+      );
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        success: 0,
+        message: 'Internal Server Error',
+      });
+    }
+  },
+
   addEventInstructors: (req, res) => {
     try {
       const body = req.body;
@@ -44,7 +108,10 @@ module.exports = {
           (err) => {
             if (err) {
               console.log(err);
-              throw new Error();
+              return res.status(500).json({
+                success: 0,
+                message: 'Database Error',
+              });
             }
           }
         );
@@ -124,6 +191,14 @@ module.exports = {
       event_service.getEventIdByInvitationCode(
         body.invitation_code,
         (err, result) => {
+          if (err) {
+            console.log(err);
+            return res.status(500).json({
+              success: 0,
+              message: 'Database Error',
+            });
+          }
+
           if (!result) {
             return res.status(409).json({
               success: 0,
@@ -158,28 +233,31 @@ module.exports = {
                           message: 'Server connection failure',
                         });
                       }
-                      attendance_service.getEventAttendances(eventID, (err, result) => {
-                        if (err) {
-                          console.log(err);
-                          return res.status(500).json({
-                            success: 0,
-                            message: 'Server connection failure',
-                          });
+                      attendance_service.getEventAttendances(
+                        eventID,
+                        (err, result) => {
+                          if (err) {
+                            console.log(err);
+                            return res.status(500).json({
+                              success: 0,
+                              message: 'Server connection failure',
+                            });
+                          }
+                          if (result) {
+                            result.map((item) => {
+                              attendance_service.insertUserAttendance({
+                                user_id: body.user_id,
+                                attendance_id: item.attendance_id,
+                                attendance_status: '0',
+                              });
+                            });
+                            return res.status(200).json({
+                              success: 1,
+                              message: 'Event join Successfully',
+                            });
+                          }
                         }
-                        if(result){
-                          result.map((item) => {
-                            attendance_service.insertUserAttendance({
-                              user_id: body.user_id, 
-                              attendance_id: item.attendance_id, 
-                              attendance_status: '0'
-                            })
-                          })
-                          return res.status(200).json({
-                            success: 1,
-                            message: 'Event join Successfully',
-                          });
-                        }
-                      })
+                      );
                     }
                   );
                 }
@@ -202,7 +280,11 @@ module.exports = {
       const body = req.body;
       event_service.removeEventMember(body, (err, result) => {
         if (err) {
-          throw new Error(err);
+          console.log(err);
+          return res.status(500).json({
+            success: 0,
+            message: 'Database Error',
+          });
         }
 
         return res.status(200).json({
@@ -225,7 +307,11 @@ module.exports = {
 
       event_service.getEvent(event_id, (err, result) => {
         if (err) {
-          throw new Error(err);
+          console.log(err);
+          return res.status(500).json({
+            success: 0,
+            message: 'Database Error',
+          });
         }
 
         return res.status(200).json({
@@ -249,7 +335,11 @@ module.exports = {
 
       event_service.getEvents(admin_id, (err, result) => {
         if (err) {
-          throw new Error(err);
+          console.log(err);
+          return res.status(500).json({
+            success: 0,
+            message: 'Database Error',
+          });
         }
 
         return res.status(200).json({
@@ -273,7 +363,11 @@ module.exports = {
 
       event_service.getUserEvents(user_id, (err, result) => {
         if (err) {
-          throw new Error(err);
+          console.log(err);
+          return res.status(500).json({
+            success: 0,
+            message: 'Database Error',
+          });
         }
 
         return res.status(200).json({
@@ -297,7 +391,11 @@ module.exports = {
 
       event_service.getEventInvitationCode(event_id, async (err, result) => {
         if (err) {
-          throw new Error(err);
+          console.log(err);
+          return res.status(500).json({
+            success: 0,
+            message: 'Database Error',
+          });
         }
 
         if (
@@ -331,7 +429,11 @@ module.exports = {
 
       event_service.getEventMembers(event_id, (err, result) => {
         if (err) {
-          throw new Error(err);
+          console.log(err);
+          return res.status(500).json({
+            success: 0,
+            message: 'Database Error',
+          });
         }
 
         return res.status(200).json({

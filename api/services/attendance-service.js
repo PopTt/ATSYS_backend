@@ -85,6 +85,19 @@ module.exports = {
     );
   },
 
+  getUserAttendanceHistories: (data, callBack) => {
+    db.query(
+      `SELECT ua.ua_id, ua.attendance_status, ua.attendance_time, ua.flash_result, ua.location, a.attendance_name, a.start_time, a.end_time, a.attendance_type FROM user_attendance ua, attendance a WHERE ua.attendance_id = a.attendance_id AND a.isDeleted = 0 AND ua.user_id = ? AND a.event_id = ?`,
+      [data.user_id, data.event_id],
+      (err, result) => {
+        if (err) {
+          callBack(err);
+        }
+        return callBack(null, result);
+      }
+    );
+  },
+
   getAttendanceByAID: (attendance_id, callBack) => {
     db.query(
       `SELECT attendance_id, attendance_name, start_time, end_time, attendance_type FROM attendance WHERE attendance_id = ?`,
@@ -198,7 +211,6 @@ module.exports = {
       }
     );
   },
-  
 
   updateUserAttendanceByUAId: (data, callBack) => {
     db.query(
