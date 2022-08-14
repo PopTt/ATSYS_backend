@@ -41,7 +41,7 @@ router.post(
 router.post('/join', [checkWebToken], event_controller.joinEvent);
 router.delete(
   '/removeEventMember',
-  [checkWebToken, checkRoles(ROLES.Admin, ROLES.Instructor)],
+  [checkWebToken, checkRoles(ROLES.Admin)],
   event_controller.removeEventMember
 );
 router.post(
@@ -51,7 +51,7 @@ router.post(
 );
 router.post(
   '/addEventStudents',
-  [checkWebToken, checkRoles(ROLES.Instructor)],
+  [checkWebToken, checkRoles(ROLES.Admin)],
   event_controller.addEventStudents
 );
 
