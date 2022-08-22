@@ -133,15 +133,13 @@ module.exports = {
   createEvent: (req, res) => {
     try {
       const body = req.body;
+      body.start_date = new Date(body.start_date);
+      body.end_date = new Date(body.end_date);
       body['established_time'] = new Date();
 
       event_service.createEvent(body, (err, result) => {
         if (err) {
-          console.log(err);
-          return res.status(500).json({
-            success: 0,
-            message: 'Server connection failure',
-          });
+          throw err;
         }
         return res.status(200).json({
           success: 1,
@@ -162,13 +160,12 @@ module.exports = {
     try {
       const body = req.body;
 
+      body.start_date = new Date(body.start_date);
+      body.end_date = new Date(body.end_date);
+
       event_service.updateEvent(body, (err, result) => {
         if (err) {
-          console.log(err);
-          return res.status(500).json({
-            success: 0,
-            message: 'Server connection failure',
-          });
+          throw err;
         }
         return res.status(200).json({
           success: 1,
